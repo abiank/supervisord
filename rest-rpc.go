@@ -2,10 +2,12 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/gorilla/mux"
-	"github.com/ochinchina/supervisord/types"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/davecgh/go-spew/spew"
+	"github.com/gorilla/mux"
+	"github.com/ochinchina/supervisord/types"
 )
 
 // SupervisorRestful the restful interface to control the programs defined in configuration file
@@ -32,6 +34,8 @@ func (sr *SupervisorRestful) CreateProgramHandler() http.Handler {
 
 // CreateSupervisorHandler create http rest interface to control supervisor itself
 func (sr *SupervisorRestful) CreateSupervisorHandler() http.Handler {
+	sr.router.HandleFunc("/supervisor/configuration", sr.ConfigurationRequestHandler).Methods("GET")
+	sr.router.HandleFunc("/supervisor/configuration", sr.ConfigurationPostHandler).Methods("POST")
 	sr.router.HandleFunc("/supervisor/shutdown", sr.Shutdown).Methods("PUT", "POST")
 	sr.router.HandleFunc("/supervisor/reload", sr.Reload).Methods("PUT", "POST")
 	return sr.router
@@ -134,6 +138,8 @@ func (sr *SupervisorRestful) StopPrograms(w http.ResponseWriter, req *http.Reque
 
 // ReadStdoutLog read the stdout of given program
 func (sr *SupervisorRestful) ReadStdoutLog(w http.ResponseWriter, req *http.Request) {
+	spew.Dump(sr.supervisor.config)
+	// TODO: implement method, remove spew
 }
 
 // Shutdown shutdown the supervisor itself
@@ -153,4 +159,21 @@ func (sr *SupervisorRestful) Reload(w http.ResponseWriter, req *http.Request) {
 	sr.supervisor.Reload()
 	r := map[string]bool{"success": reply.Ret}
 	json.NewEncoder(w).Encode(&r)
+}
+
+func (sr *SupervisorRestful) ConfigurationRequestHandler(w http.ResponseWriter, req *http.Request) {
+	defer req.Body.Close()
+	dat, _ := ioutil.ReadFile(sr.supervisor.configfilepath)
+	w.Write(dat)
+}
+
+func (sr *SupervisorRestful) ConfigurationPostHandler(w http.ResponseWriter, req *http.Request) {
+	defer req.Body.Close()
+	body, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		panic(err)
+	}
+	// TODO: save a backup
+	err = ioutil.WriteFile(sr.supervisor.configfilepath, body, 0644)
+	w.Write(body)
 }

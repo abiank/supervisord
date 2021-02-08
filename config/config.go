@@ -106,7 +106,7 @@ func NewConfig(configFile string) *Config {
 	return &Config{configFile, make(map[string]*Entry), NewProcessGroup()}
 }
 
-//create a new entry or return the already-exist entry
+//create a new entry or return the already-existing entry
 func (c *Config) createEntry(name string, configDir string) *Entry {
 	entry, ok := c.entries[name]
 

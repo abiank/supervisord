@@ -277,6 +277,36 @@
               });
   }
 
+  function modify_config() {
+      $.ajax({
+              type: "GET",
+              url: "/supervisor/configuration",
+              dataType: "html",
+              success: function( data, status, jqXHR ) {
+                document.getElementById("configtext").value=data;
+                $('#configModal').modal('toggle')
+              },
+              error: function( jqXHR, textStatus, errorThrown ) {
+                alert( textStatus );
+              }
+              });
+  }
+
+  function save_config() {
+      $.ajax({
+              type: "POST",
+              url: "/supervisor/configuration",
+              dataType: "html",
+              data:document.getElementById("configtext").value,
+              success: function( data, status, jqXHR ) {
+                alert("Config saved. Click reload to update it.")
+              },
+              error: function( jqXHR, textStatus, errorThrown ) {
+                alert( textStatus );
+              }
+              });
+  }
+
   $(document).ready(function() {
       list_programs();
   });    
@@ -291,6 +321,7 @@
               <input type="button" class="btn btn-primary float-right mr-1" value="Reload" onclick='reload_supervisor();'>
               <input type="button" class="btn btn-primary float-right mr-1" value="Stop Select" onclick='stop_select();'>
               <input type="button" class="btn btn-primary float-right mr-1" value="Start Select" onclick='start_select();'>
+              <input type="button" class="btn btn-primary float-right mr-1" value="Modify Config" onclick='modify_config();'>
           </div>
       </div>
       <div class="table-responsive mt-3">          
@@ -322,6 +353,24 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" data-dismiss="modal" id='my-modal-cancel-btn'>Cancel</button>
                     <button type="button" class="btn btn-primary" data-dismiss="modal" id='my-modal-confirm-btn'>Shutdown</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="configModal" class="modal fade">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="my-modal-title">Configuration file</h4>
+                </div>
+                <div class="modal-body">
+                    <textarea style="width:100%;height:50%" id="configtext"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id='my-modal-cancel-btn'>Cancel</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id='my-modal-confirm-btn' onclick="save_config()">Save</button>
                 </div>
             </div>
         </div>

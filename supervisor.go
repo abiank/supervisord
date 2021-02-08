@@ -28,11 +28,12 @@ const (
 // Supervisor manage all the processes defined in the supervisor configuration file.
 // All the supervisor public interface is defined in this class
 type Supervisor struct {
-	config     *config.Config   // supervisor configuration
-	procMgr    *process.Manager // process manager
-	xmlRPC     *XMLRPC          // XMLRPC interface
-	logger     logger.Logger    // logger manager
-	restarting bool             // if supervisor is in restarting state
+	config         *config.Config   // supervisor configuration
+	procMgr        *process.Manager // process manager
+	xmlRPC         *XMLRPC          // XMLRPC interface
+	logger         logger.Logger    // logger manager
+	restarting     bool             // if supervisor is in restarting state
+	configfilepath string
 }
 
 // StartProcessArgs arguments for starting a process
@@ -90,9 +91,10 @@ type ProcessTailLog struct {
 // NewSupervisor create a Supervisor object with supervisor configuration file
 func NewSupervisor(configFile string) *Supervisor {
 	return &Supervisor{config: config.NewConfig(configFile),
-		procMgr:    process.NewManager(),
-		xmlRPC:     NewXMLRPC(),
-		restarting: false}
+		procMgr:        process.NewManager(),
+		xmlRPC:         NewXMLRPC(),
+		restarting:     false,
+		configfilepath: configFile}
 }
 
 // GetConfig get the loaded superisor configuration
