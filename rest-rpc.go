@@ -27,6 +27,7 @@ func (sr *SupervisorRestful) CreateProgramHandler() http.Handler {
 	sr.router.HandleFunc("/program/start/{name}", sr.StartProgram).Methods("POST", "PUT")
 	sr.router.HandleFunc("/program/stop/{name}", sr.StopProgram).Methods("POST", "PUT")
 	sr.router.HandleFunc("/program/log/{name}/stdout", sr.ReadStdoutLog).Methods("GET")
+	sr.router.HandleFunc("/program/show/{name}", sr.ShowLog).Methods("GET")
 	sr.router.HandleFunc("/program/startPrograms", sr.StartPrograms).Methods("POST", "PUT")
 	sr.router.HandleFunc("/program/stopPrograms", sr.StopPrograms).Methods("POST", "PUT")
 	return sr.router
@@ -139,6 +140,13 @@ func (sr *SupervisorRestful) StopPrograms(w http.ResponseWriter, req *http.Reque
 // ReadStdoutLog read the stdout of given program
 func (sr *SupervisorRestful) ReadStdoutLog(w http.ResponseWriter, req *http.Request) {
 	spew.Dump(sr.supervisor.config)
+	// TODO: implement method, remove spew
+}
+
+func (sr *SupervisorRestful) ShowLog(w http.ResponseWriter, req *http.Request) {
+	defer req.Body.Close()
+	spew.Dump(sr.supervisor.GetPrograms())
+	spew.Dump(sr.supervisor.GetManager())
 	// TODO: implement method, remove spew
 }
 
